@@ -8,6 +8,7 @@ use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -20,6 +21,20 @@ final class InvMenuEventHandler implements Listener{
 	
 	public function __construct(PlayerManager $player_manager){
 		$this->player_manager = $player_manager;
+	}
+
+	/**
+	 * @param PlayerCommandPreprocessEvent $event
+	 * @priority LOW
+	 */
+	public function onCommandPreProcess(PlayerCommandPreprocessEvent $event): void {
+		$session = $this->player_manager->getNullable($event->getPlayer());
+
+		if($session !== null){
+			if($session->getCurrent() !== null){
+				$event->cancel();
+			}
+		}
 	}
 
 	/**
